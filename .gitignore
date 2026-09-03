@@ -35,6 +35,9 @@ dist/
 
 # Storage & database
 storage/
+!backend/app/storage/
+backend/app/storage/*
+!backend/app/storage/__init__.py
 *.db
 
 # IDE
