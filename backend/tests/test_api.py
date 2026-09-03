@@ -81,12 +81,12 @@ async def editor_user():
 
 
 @pytest_asyncio.fixture
-def admin_token(admin_user):
+async def admin_token(admin_user):
     return create_access_token({"sub": str(admin_user.id), "role": admin_user.role})
 
 
 @pytest_asyncio.fixture
-def editor_token(editor_user):
+async def editor_token(editor_user):
     return create_access_token({"sub": str(editor_user.id), "role": editor_user.role})
 
 
