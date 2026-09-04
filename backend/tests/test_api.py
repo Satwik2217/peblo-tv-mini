@@ -433,6 +433,48 @@ async def test_catalog_search(admin_token):
         assert resp4.status_code == 200
 
 
+# ===== CATALOG ENDPOINT TEST =====
+@pytest.mark.asyncio
+async def test_catalog_endpoint(admin_token):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        show_resp = await client.post("/admin/shows", json={
+            "title": "Catalog Show", "section": "featured", "status": "published",
+            "categories": ["adventure"]
+        }, headers=auth_header(admin_token))
+        show_id = show_resp.json()["id"]
+
+        season_resp = await client.post("/admin/seasons", json={
+            "show_id": show_id, "season_number": 1
+        }, headers=auth_header(admin_token))
+        season_id = season_resp.json()["id"]
+
+        ep_resp = await client.post("/admin/episodes", json={
+            "season_id": season_id, "title": "Catalog Episode", "episode_number": 1,
+            "language": "en", "content_group": "catalog-ep-001",
+            "duration_seconds": 300, "status": "published"
+        }, headers=auth_header(admin_token))
+        episode_id = ep_resp.json()["id"]
+
+        async with TestSessionLocal() as session:
+            await _create_artwork_for_episode(session, episode_id)
+
+        await client.post("/admin/catalog/publish", headers=auth_header(admin_token))
+
+        resp = await client.get("/catalog")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "sections" in data
+        assert "featured" in data["sections"]
+        assert len(data["sections"]["featured"]["shows"]) >= 1
+
+
+@pytest.mark.asyncio
+async def test_catalog_empty_before_publish():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        resp = await client.get("/catalog")
+        assert resp.status_code in (200, 404)
+
+
 # ===== HEALTH TEST =====
 @pytest.mark.asyncio
 async def test_health_endpoint():

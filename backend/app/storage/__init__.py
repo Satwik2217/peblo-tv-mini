@@ -40,8 +40,9 @@ class LocalStorageBackend(StorageBackend):
         self.base_path.mkdir(parents=True, exist_ok=True)
 
     def _resolve(self, key: str) -> Path:
-        safe = _safe_key_part(key)
-        return self.base_path / safe
+        parts = key.replace("\\", "/").split("/")
+        safe_parts = [_safe_key_part(p) for p in parts]
+        return self.base_path / "/".join(safe_parts)
 
     async def save(self, key: str, data: bytes, mime_type: str) -> str:
         path = self._resolve(key)

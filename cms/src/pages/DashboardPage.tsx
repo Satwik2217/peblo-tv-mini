@@ -413,7 +413,7 @@ export function DashboardPage() {
               <button onClick={() => setShowingCreateEpisode(true)} style={{ padding: '8px 16px', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>+ New Episode</button>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
               <input placeholder="Search episodes..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px', width: '200px' }} />
               <select value={languageFilter} onChange={(e) => { setLanguageFilter(e.target.value); setPage(1); }} style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
                 <option value="">All Languages</option>
@@ -425,6 +425,7 @@ export function DashboardPage() {
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
               </select>
+              <button onClick={() => { setSearch(''); setLanguageFilter(''); setStatusFilter(''); setPage(1); }} style={{ padding: '6px 12px', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', background: 'white', fontSize: '13px' }}>Clear filters</button>
             </div>
 
             {showingCreateEpisode && <EpisodeForm showId={selectedShowId || undefined} onSave={(data) => createEpisodeMutation.mutate(data)} onCancel={() => setShowingCreateEpisode(false)} />}

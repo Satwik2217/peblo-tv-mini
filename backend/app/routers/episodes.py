@@ -102,6 +102,12 @@ async def create_episode(
             detail=f"Episode with content_group '{episode_data.content_group}' and language '{episode_data.language}' already exists.",
         )
 
+    if episode_data.status == "published" and not episode_data.duration_seconds:
+        raise HTTPException(
+            status_code=422,
+            detail="A published episode must have a duration.",
+        )
+
     episode = Episode(
         season_id=episode_data.season_id,
         title=episode_data.title,
@@ -174,6 +180,13 @@ async def update_episode(
     if episode_data.content_group is not None:
         ep.content_group = episode_data.content_group
     if episode_data.status is not None:
+        new_status = episode_data.status
+        new_duration = episode_data.duration_seconds if episode_data.duration_seconds is not None else ep.duration_seconds
+        if new_status == "published" and not new_duration:
+            raise HTTPException(
+                status_code=422,
+                detail="A published episode must have a duration.",
+            )
         ep.status = episode_data.status
 
     await db.flush()
